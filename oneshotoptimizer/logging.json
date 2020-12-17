@@ -1,0 +1,38 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s %(name)s:%(lineno)s [%(levelname)s] - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "standard",
+            "stream": "ext://sys.stdout"
+        },
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "/var/log/optimizer/optimizer.log",
+            "maxBytes": "16777216",
+            "formatter": "standard"
+        }
+    },
+    "loggers": {
+        "oneshot_optimizer.optimizer.api": {
+            "handlers": ["console", "file"],
+            "level": "DEBUG"
+        },
+        "oneshot_optimizer.optimizer.utility": {
+            "handlers": ["file"],
+            "level": "DEBUG"
+        },
+        "oneshot_optimizer.optimizer.uanataca": {
+            "handlers": ["file"],
+            "level": "DEBUG"
+        }
+    }
+}

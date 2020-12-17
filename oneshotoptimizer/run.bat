@@ -1,0 +1,1 @@
+docker run -p 8400:443 -v c:\temp\xx\tmp\:/opt/bit4id/oneshot_optimizer/tmp/ -v c:\temp\xx\tokens\tokens.json:/opt/bit4id/oneshot_optimizer/etc/tokens.json -v c:\temp\xx\:/var/log oneshotoptimizer:1.0

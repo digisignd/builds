@@ -1,0 +1,16 @@
+#!/home/asi/envs/hpython_linux/bin/python2
+# -*- coding: utf-8 -*-
+import os
+import re
+import sys
+
+from gunicorn.app.wsgiapp import run
+
+if __name__ == '__main__':
+
+    path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), os.pardir)
+    os.environ['ONESHOT_ENV'] = os.path.abspath(path)
+    print os.environ
+    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+    sys.exit(run())
