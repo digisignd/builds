@@ -1,0 +1,102 @@
+#!/bin/bash
+#
+# bit4-%(license)s-connector - this script starts and stops the bit4-%(license)s-connector service
+#
+# chkconfig: 2345 88 12
+# description: Bit4id connector server
+
+#set -uex
+
+PORT=%(port)s
+
+SERVICENAME="bit4-%(license)s-connector"
+COMMAND="${1:-help}"
+
+
+ROOT="$(dirname "$(readlink -f "$0")")"
+ROOT="${ROOT%%/etc/init.d}"
+
+PIDFILE="$ROOT/var/run/$SERVICENAME/pid"
+LOGFILE="%(logfile)s"
+HPYTHON="$ROOT/bin/connector"
+LICENSE=%(license)s
+
+is_running() {
+    [ -r "$PIDFILE" ] && ps -p "$(cat "$PIDFILE")" >/dev/null
+}
+
+start() {
+    echo -n "Starting $SERVICENAME: "
+    su -c "BIT4LICENSE=$LICENSE $HPYTHON --logfile=\"$LOGFILE\" \
+        --pidfile=\"$PIDFILE\" --logmaxsize=1000 --port=\"$PORT\" \
+        --enable-deferred --daemonize --appmodule=connector.app" - %(runas)s
+    echo OK
+}
+
+stop() {
+    local count=1
+    echo -n "Shutting down $SERVICENAME: "
+    while is_running; do
+        kill "$(cat "$PIDFILE")"
+        sleep 1
+        echo -n "${count}... "
+        if [ $count -eq 15 ]; then
+            if is_running; then
+                kill -9 "$(cat "$PIDFILE")"
+                sleep 1
+                echo -n 'kill... '
+                if is_running; then
+                    echo ERROR
+                    return 1
+                else
+                    break
+                fi
+            fi
+        fi
+        count=$(($count+1))
+    done
+    rm -f "$PIDFILE"
+    echo OK
+}
+
+reload() {
+    echo -n "Reloading the configuration for $SERVICENAME: "
+    kill -USR1 "$(cat "$PIDFILE")"
+    echo OK
+}
+
+case "$COMMAND" in
+    start)
+        if is_running; then
+            echo "$SERVICENAME is already running"
+        else
+            start
+        fi
+        ;;
+    stop)
+        if is_running; then
+            stop
+        else
+            echo "$SERVICENAME is already stopped"
+        fi
+        ;;
+    restart)
+        is_running && stop
+        start
+        ;;
+    reload)
+        is_running && stop
+        start
+        ;;
+    status)
+        if is_running; then
+            echo "$SERVICENAME is running"
+        else
+            echo "$SERVICENAME is stopped"
+        fi
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status|restart|reload}"
+        exit 2
+        ;;
+esac

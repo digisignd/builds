@@ -1,0 +1,10 @@
+FROM centos:centos7
+LABEL maintainer="Digisign"
+
+RUN yum -y update && yum -y upgrade \
+    && yum -y install wget netcat telnet traceroute net-tools
+
+COPY ./bit4id /opt/bit4id/
+COPY ./entrypoint.sh /
+
+ENTRYPOINT ["sh","/entrypoint.sh"]

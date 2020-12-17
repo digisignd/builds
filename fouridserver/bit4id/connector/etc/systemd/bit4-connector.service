@@ -1,0 +1,10 @@
+[Unit]
+Description=Bit4id connector server
+
+[Service]
+Environment=BIT4LICENSE=%(license)s
+ExecStart=%(root)s/bin/connector --logfile=/var/log/bit4-%(license)s-connector/bit4-%(license)s-connector.log --logmaxsize=1000 --port=%(port)s --enable-deferred --appmodule=connector.app
+%(runas)s
+
+[Install]
+WantedBy=multi-user.target
